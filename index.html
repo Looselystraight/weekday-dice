@@ -4,192 +4,185 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Wochentag würfeln</title>
-  <!-- Social Preview -->
-<meta property="og:title" content="Wochentag würfeln" />
-<meta property="og:description" content="Klick. Gong. Ein Tag von Montag bis Sonntag." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://looselystraight.github.io/weekday-dice/" />
-<meta property="og:image" content="https://looselystraight.github.io/weekday-dice/assets/preview.png?v=1" />
-<meta name="twitter:card" content="summary_large_image" />
-<link rel="icon" href="https://looselystraight.github.io/weekday-dice/assets/symbol_gold.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;700&family=Inter:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="./assets/symbol_gold.png?v=2202" />
   <style>
     :root{
-      --tergar-orange:#E28E1B;
-      --tergar-orange-600:#C97300;
-      --ink:#1f1f1f;
-      --paper:#fcfaf6;
+      --navy:#123A7B; --coral:#EB5A44; --mint:#CDECC6; --pale:#B9C6F0;
+      --ink:#F5F7FF; --tile:#ffffff; --tergar:#E28E1B; --tergar-dark:#C97300;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; background:radial-gradient(1200px 600px at 10% -10%, #fff3e0, var(--paper));
-      color:var(--ink); font-family:"Merriweather", serif;
+      margin:0; color:var(--ink);
+      background: radial-gradient(1200px 600px at 50% -5%, #2B4FA0, var(--navy));
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+      overflow-x:hidden;
     }
-    header{display:flex; justify-content:center; padding:18px 0}
-    header img{height:42px; width:auto}
-    h1{ text-align:center; font-size:clamp(1.6rem,1.2rem + 1.6vw,2.4rem); margin:0 0 8px}
-    .stage{ perspective:1000px; width:260px; height:260px; margin:18px auto 6px auto; }
-    .cube{
-      width:160px; height:160px; position:relative; margin:50px auto;
-      transform-style:preserve-3d; transform: translateZ(-80px) rotateX(-24deg) rotateY(38deg);
-      transition: transform 1.2s cubic-bezier(.17,.67,.32,1.28);
+    .fw{position:fixed; pointer-events:none; z-index:0; mix-blend-mode:screen}
+    .fw.tl{top:-14px; left:-10px; width:min(42vw, 520px); opacity:.85}
+    .fw.cl{top:50%; left:18%; transform:translateY(-50%); width:min(26vw, 280px); opacity:.94; filter: drop-shadow(0 8px 12px rgba(0,0,0,.25));}
+    .fw.cr{top:50%; right:18%; transform:translateY(-50%); width:min(26vw, 280px); opacity:.94; filter: drop-shadow(0 8px 12px rgba(0,0,0,.25));}
+
+    @media (max-width: 760px){
+      .fw.cl{left:12%; width:min(34vw, 240px);}
+      .fw.cr{right:12%; width:min(34vw, 240px);}
     }
-    .face{
-      position:absolute; width:160px; height:160px; display:flex; align-items:center; justify-content:center;
-      font-size:3rem; font-weight:700;
-      background:linear-gradient(180deg,#fff,#fff7ea); color:var(--ink);
-      border:2px solid rgba(0,0,0,.08); border-radius:24px;
-      box-shadow: inset 0 0 0 2px rgba(226,142,27,.25), 0 10px 30px rgba(226,142,27,.15);
+
+    header{display:flex; justify-content:center; padding:20px 0 4px; position:relative; z-index:1}
+    header img{height:42px; width:auto; filter: drop-shadow(0 4px 8px rgba(0,0,0,.25));}
+    h1{ text-align:center; font-family:"Merriweather", serif; font-weight:800; margin:12px 0 16px; font-size:clamp(1.8rem, 2.4rem, 3.2rem); position:relative; z-index:1}
+    @media (max-width: 520px){
+      h1{ font-size: clamp(2.0rem, 7vw, 2.4rem); font-weight:800; }
     }
-    .face::after{
-      content:""; position:absolute; inset:10px; border-radius:18px;
-      background:url("./assets/symbol_gold.png") center/64px 64px no-repeat, linear-gradient(180deg, rgba(226,142,27,.08), rgba(226,142,27,.04));
-      opacity:.28; pointer-events:none;
-    }
-    .front { transform: rotateY(0deg) translateZ(80px); }
-    .back  { transform: rotateY(180deg) translateZ(80px); }
-    .right { transform: rotateY(90deg) translateZ(80px); }
-    .left  { transform: rotateY(-90deg) translateZ(80px); }
-    .top   { transform: rotateX(90deg) translateZ(80px); }
+
+    .wrap{max-width:980px; margin:0 auto; padding:0 16px 64px; position:relative; z-index:1}
+
+    .stage{ perspective:1000px; height:260px; margin:24px auto 10px; width:220px; position:relative;}
+    .cube{ position:relative; width:160px; height:160px; transform-style:preserve-3d;
+           margin:0 auto; top:30px; filter: drop-shadow(0 18px 28px rgba(0,0,0,.35));
+           animation: idle 7s ease-in-out infinite; }
+    @keyframes idle{ 0%{transform:rotateX(-12deg) rotateY(24deg)} 50%{transform:rotateX(-18deg) rotateY(-18deg)} 100%{transform:rotateX(-12deg) rotateY(24deg)} }
+    .face{ position:absolute; inset:0; background:var(--tile); border-radius:18px;
+           display:flex; align-items:center; justify-content:center;
+           box-shadow: inset 0 1px 0 #fff; }
+    .face::after{ content:""; display:block; width:90px; height:90px; opacity:.95;
+                  background:url('./assets/symbol_gold.png?v=2202') center/contain no-repeat; }
+    .front{ transform: translateZ(80px); }
+    .back{ transform: rotateY(180deg) translateZ(80px); }
+    .right{ transform: rotateY(90deg) translateZ(80px); }
+    .left{ transform: rotateY(-90deg) translateZ(80px); }
+    .top{ transform: rotateX(90deg) translateZ(80px); }
     .bottom{ transform: rotateX(-90deg) translateZ(80px); }
 
-    .controls{ text-align:center; }
-    .btn{
-      appearance:none; border:none; cursor:pointer;
-      padding:12px 18px; border-radius:999px; color:white;
-      background:linear-gradient(180deg,var(--tergar-orange),var(--tergar-orange-600));
-      font-family:"Inter", system-ui, sans-serif; font-weight:700;
-      box-shadow:0 10px 20px rgba(226,142,27,.30), 0 2px 6px rgba(0,0,0,.12);
+    .day{
+      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+      width: 220px; height: 220px; border-radius:24px; pointer-events:none;
+      display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(180deg, #ffffff, #f5f8ff66);
+      box-shadow: 0 14px 30px rgba(0,0,0,.35), inset 0 1px 0 #fff;
+      font-family:"Merriweather", serif; font-weight:800; font-size:76px; letter-spacing:.02em;
+      color:#18233a; text-shadow: 0 1px 0 rgba(255,255,255,.9);
+      z-index:3; transition: box-shadow .25s ease, transform .12s ease;
     }
-    .btn:active{ transform:translateY(1px) }
-    .hint{ color:#555; margin-top:10px; font-family:"Inter", system-ui, sans-serif; }
-    .result{ margin-top:14px; font-size:1.6rem; font-weight:700; text-align:center }
-  
-    .stage{ position:relative; }
-    .sparkles{ position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; }
-    .sparkles span{
-      position:absolute; width:6px; height:6px; background:var(--tergar-orange);
-      border-radius:50%; opacity:0; transform:translate(0,0) scale(.7);
-      box-shadow:0 0 0 1px rgba(255,255,255,.6) inset;
+    .day.glow{
+      box-shadow: 0 0 0 8px rgba(226,142,27,.25), 0 18px 36px rgba(0,0,0,.45), inset 0 1px 0 #fff;
+      transform: translate(-50%,-50%) scale(1.01);
     }
-    .sparkles span:nth-child(1){ --tx:  60px; --ty:   0px; }
-    .sparkles span:nth-child(2){ --tx:  42px; --ty:  42px; }
-    .sparkles span:nth-child(3){ --tx:   0px; --ty:  60px; }
-    .sparkles span:nth-child(4){ --tx: -42px; --ty:  42px; }
-    .sparkles span:nth-child(5){ --tx: -60px; --ty:   0px; }
-    .sparkles span:nth-child(6){ --tx: -42px; --ty: -42px; }
-    .sparkles span:nth-child(7){ --tx:   0px; --ty: -60px; }
-    .sparkles span:nth-child(8){ --tx:  42px; --ty: -42px; }
-    @keyframes sparklePop{
-      0%{ opacity:1; transform:translate(0,0) scale(.7); }
-      85%{ opacity:.8; }
-      100%{ opacity:0; transform:translate(var(--tx), var(--ty)) scale(1); }
-    }
-    .sparkles.show span{ animation: sparklePop 700ms ease-out both; }
-    .sparkles.show span:nth-child(2){ animation-delay: 20ms; }
-    .sparkles.show span:nth-child(3){ animation-delay: 40ms; }
-    .sparkles.show span:nth-child(4){ animation-delay: 60ms; }
-    .sparkles.show span:nth-child(5){ animation-delay: 80ms; }
-    .sparkles.show span:nth-child(6){ animation-delay:100ms; }
-    .sparkles.show span:nth-child(7){ animation-delay:120ms; }
-    .sparkles.show span:nth-child(8){ animation-delay:140ms; }
 
+    .controls{ text-align:center; margin-top:16px; position:relative; z-index:1}
+    .btn{
+      display:inline-block; border:0; border-radius:999px; padding:12px 26px;
+      background:var(--tergar); color:#fff; font-weight:800; font-size:16px; cursor:pointer;
+      box-shadow: 0 10px 24px rgba(226,142,27,.45);
+      transition: transform .06s ease, filter .12s ease;
+    }
+    .btn:hover{ filter: brightness(1.08); }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+    .btn:disabled{opacity:.6; cursor:default; box-shadow:none}
+
+    .hint{ text-align:center; margin:16px 0 10px; color:#DFE6FF; position:relative; z-index:1}
+    .result{ text-align:center; font-family:"Merriweather", serif; font-size:clamp(1.5rem, 1.2rem + .9vw, 2.2rem); font-weight:800; margin:8px 0 0; position:relative; z-index:1; color:#fff}
+
+    .twinkles{position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:2;}
+    .twinkles span{
+      position:absolute; width:10px; height:10px; border-radius:50%;
+      background: radial-gradient(circle, #fff 0%, #fff8 55%, transparent 70%);
+      box-shadow: 0 0 10px #fff6;
+      animation: twinkle 1600ms ease-in-out infinite;
+    }
+    .twinkles span.mint{ background: radial-gradient(circle, var(--mint) 0%, #fff6 60%, transparent 80%); }
+    .twinkles span.coral{ background: radial-gradient(circle, var(--coral) 0%, #fff6 60%, transparent 80%); }
+    .twinkles span.orange{ background: radial-gradient(circle, var(--tergar) 0%, #fff6 60%, transparent 80%); }
+    @keyframes twinkle{
+      0%,100%{ opacity:0.25; transform:scale(0.9); }
+      50%{ opacity:0.9; transform:scale(1.2); }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <img src="./assets/symbol_gold.png" alt="Tergar Logo">
-  </header>
+  <!-- Décor: top-left + two center, no bottom-right -->
+  <img class="fw tl" src="./assets/fw-tl.svg?v=2202" alt="" aria-hidden="true">
+  <img class="fw cl" src="./assets/fw-center-left.svg?v=2202" alt="" aria-hidden="true">
+  <img class="fw cr" src="./assets/fw-center-right.svg?v=2202" alt="" aria-hidden="true">
 
-  <main>
+  <header><img src="./assets/symbol_gold.png?v=2202" alt="Tergar Logo"></header>
+  <div class="wrap">
     <h1>Wochentag würfeln</h1>
 
-    <section class="stage">
-      <div class="sparkles" aria-hidden="true">        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+    <div class="stage" aria-hidden="true">
+      <div class="cube" id="cube">
+        <div class="face front"></div>
+        <div class="face back"></div>
+        <div class="face right"></div>
+        <div class="face left"></div>
+        <div class="face top"></div>
+        <div class="face bottom"></div>
       </div>
-      <div id="cube" class="cube" aria-hidden="true">
-        <div class="face front">Mo</div>
-        <div class="face back">Di</div>
-        <div class="face right">Mi</div>
-        <div class="face left">Do</div>
-        <div class="face top">Fr</div>
-        <div class="face bottom">Sa</div>
-      </div>
-    </section>
+      <div class="day" id="abbr">–</div>
+    </div>
 
-    <section class="controls">
-      <button id="rollBtn" class="btn">Click</button>
-      <p class="hint">Klick. Der Gong ertönt. Ein Tag wird gewählt. Von Montag bis Sonntag.</p>
-      <div class="result" aria-live="polite" aria-atomic="true"><span id="resultDay">–</span></div>
-      <audio id="gong" preload="auto">
-        <source src="./assets/gong.mp3" type="audio/mpeg">
-      </audio>
-    </section>
-  </main>
+    <div class="controls">
+      <button id="roll" class="btn" type="button">Click</button>
+    </div>
 
-  <script>
-    // Minimal, robust logic. Based on the working V3a pattern.
-    const cube = document.getElementById('cube');
-    const gong = document.getElementById('gong');
-    const result = document.getElementById('resultDay');
-    const rollBtn = document.getElementById('rollBtn');
+    <p class="hint">Klick. Der Gong ertönt. Ein Tag wird gewählt. Von Montag bis Sonntag.</p>
+    <div id="result" class="result">–</div>
+  </div>
 
-    const days = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
-    const orientations = [
-      {x:0, y:0},{x:0, y:180},{x:0, y:90},{x:0, y:-90},{x:-90, y:0},{x:90, y:0}
-    ];
+  <div class="twinkles" aria-hidden="true">
+    <span class="mint"   style="left: 28%; top: 44%; animation-delay: 200ms;"></span>
+    <span class="orange" style="left: 32%; top: 54%; animation-delay: 650ms;"></span>
+    <span class="orange" style="left: 50%; top: 36%; animation-delay: 750ms;"></span>
+    <span class="coral"  style="left: 50%; top: 66%; animation-delay: 300ms;"></span>
+  </div>
 
-    function synthGong(){
-      try{
-        const ctx = new (window.AudioContext||window.webkitAudioContext)();
-        const o = ctx.createOscillator(); const g = ctx.createGain();
-        o.type='sine'; o.frequency.setValueAtTime(440, ctx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 2.5);
-        g.gain.setValueAtTime(0.001, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 3.2);
-        o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 3.4);
-      }catch(e){}
-    }
+  <audio id="gong" preload="auto">
+    <source src="./assets/gong.mp3?v=2202" type="audio/mpeg">
+  </audio>
 
-    function playGong(){
-      try{
-        gong.pause();
-        gong.currentTime = 0;
-        const p = gong.play();
-        if (p && typeof p.catch === 'function'){ p.catch(() => playFresh()); }
-      }catch(e){ playFresh(); }
-      function playFresh(){
-        try{ new Audio('./assets/gong.mp3').play().catch(()=> synthGong()); }
-        catch(e){ synthGong(); }
-      }
-    }
+<script>
+  const days = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
+  const abbr = ['Mo','Di','Mi','Do','Fr','Sa','So'];
 
-    function roll(){
-      const idx = Math.floor(Math.random()*7);
-      const chosen = days[idx];
-      const spinsX = 2 + Math.floor(Math.random()*2);
-      const spinsY = 2 + Math.floor(Math.random()*3);
-      const base = idx===6 ? orientations[Math.floor(Math.random()*6)] : orientations[idx];
-      const x = 360*spinsX + base.x;
-      const y = 360*spinsY + base.y;
-      cube.style.transform = `translateZ(-80px) rotateX(${x}deg) rotateY(${y}deg)`;
-      playGong();
-      const sp = document.querySelector('.sparkles');
-      if (sp){ sp.classList.remove('show'); void sp.offsetWidth; sp.classList.add('show'); }
-      setTimeout(()=>{ result.textContent = chosen; }, 900);
-    }
-    rollBtn.addEventListener('click', roll);
-  </script>
+  const rollBtn = document.getElementById('roll');
+  const abbrEl = document.getElementById('abbr');
+  const result = document.getElementById('result');
+  const gong = document.getElementById('gong');
+  const cube = document.getElementById('cube');
+  const dayTile = document.getElementById('abbr');
+
+  function glowPulse(){
+    dayTile.classList.add('glow');
+    setTimeout(()=> dayTile.classList.remove('glow'), 500);
+  }
+
+  function roll(){
+    rollBtn.disabled = true;
+    const idx = Math.floor(Math.random()*7);
+    const name = days[idx];
+    const a = abbr[idx];
+
+    cube.animate([
+      {transform:'rotateX(-12deg) rotateY(24deg)'},
+      {transform:'rotateX(-12deg) rotateY(384deg)'},
+      {transform:'rotateX(-12deg) rotateY(24deg)'}
+    ], {duration:560, easing:'cubic-bezier(.2,.6,.2,1)'});
+
+    abbrEl.textContent = a;
+    result.textContent = name;
+
+    try{ gong.currentTime = 0; }catch(e){}
+    const p = gong.play(); if(p && p.catch){ p.catch(()=>{}); }
+
+    glowPulse();
+    setTimeout(()=> rollBtn.disabled = false, 600);
+  }
+
+  rollBtn.addEventListener('click', roll);
+  rollBtn.addEventListener('keydown', e=>{
+    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); roll(); }
+  });
+</script>
 </body>
 </html>
